@@ -50,6 +50,7 @@ import org.springframework.util.StringUtils;
 public class BeanNameUrlHandlerMapping extends AbstractDetectingUrlHandlerMapping {
 
 	/**
+	 * 检查 beanName 和 alias 是不是以 "/" 开头
 	 * Checks name and aliases of the given bean for URLs, starting with "/".
 	 */
 	@Override

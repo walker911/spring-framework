@@ -153,6 +153,7 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 		else {
 			urlMap.forEach((url, handler) -> {
 				// Prepend with slash if not already present.
+				// 注册前一些预处理
 				if (!url.startsWith("/")) {
 					url = "/" + url;
 				}
