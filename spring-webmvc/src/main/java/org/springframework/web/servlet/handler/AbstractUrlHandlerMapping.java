@@ -112,6 +112,8 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 	}
 
 	/**
+	 * 用 URL 从 Map 中获取 Handler 的过程
+	 *
 	 * Look up a handler for the URL path of the given request.
 	 * @param request current HTTP request
 	 * @return the handler instance, or {@code null} if none found
@@ -125,6 +127,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 		if (handler == null) {
 			// We need to care for the default handler directly, since we need to
 			// expose the PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE for it as well.
+			// 定义一个临时变量，保存找到的原始 Handler
 			Object rawHandler = null;
 			if ("/".equals(lookupPath)) {
 				rawHandler = getRootHandler();
@@ -134,10 +137,12 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 			}
 			if (rawHandler != null) {
 				// Bean name or resolved handler?
+				// 如果是 String 类型，则到容器中查找具体的 Bean
 				if (rawHandler instanceof String) {
 					String handlerName = (String) rawHandler;
 					rawHandler = obtainApplicationContext().getBean(handlerName);
 				}
+				// 可以用来校验找到的 Handler 和 request 是否匹配，是模板方法，而且子类也没有使用
 				validateHandler(rawHandler, request);
 				handler = buildPathExposingHandler(rawHandler, lookupPath, lookupPath, null);
 			}
@@ -161,9 +166,11 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 	@Nullable
 	protected Object lookupHandler(String urlPath, HttpServletRequest request) throws Exception {
 		// Direct match?
+		// 直接从 Map 中获取
 		Object handler = this.handlerMap.get(urlPath);
 		if (handler != null) {
 			// Bean name or resolved handler?
+			// 如果是 String 类型，则从容器中获取
 			if (handler instanceof String) {
 				String handlerName = (String) handler;
 				handler = obtainApplicationContext().getBean(handlerName);
@@ -173,6 +180,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 		}
 
 		// Pattern match?
+		// Pattern 匹配，比如使用带 * 号的模式与 url 进行匹配
 		List<String> matchingPatterns = new ArrayList<>();
 		for (String registeredPattern : this.handlerMap.keySet()) {
 			if (getPathMatcher().match(registeredPattern, urlPath)) {
@@ -206,6 +214,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 				}
 			}
 			// Bean name or resolved handler?
+			// 如果是 String 类型，则从容器中获取
 			if (handler instanceof String) {
 				String handlerName = (String) handler;
 				handler = obtainApplicationContext().getBean(handlerName);
@@ -226,6 +235,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 			if (logger.isTraceEnabled() && uriTemplateVariables.size() > 0) {
 				logger.trace("URI variables " + uriTemplateVariables);
 			}
+			// 注册两个拦截器
 			return buildPathExposingHandler(handler, bestMatch, pathWithinMapping, uriTemplateVariables);
 		}
 
@@ -332,6 +342,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 		Object resolvedHandler = handler;
 
 		// Eagerly resolve handler if referencing singleton via name.
+		// 如果 Handler是 String 类型，而且没有设置 lazyInitHandlers, 则从 SpringMVC 容器中获取 Handler
 		if (!this.lazyInitHandlers && handler instanceof String) {
 			String handlerName = (String) handler;
 			ApplicationContext applicationContext = obtainApplicationContext();
@@ -341,6 +352,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 		}
 
 		Object mappedHandler = this.handlerMap.get(urlPath);
+		// 原来保存和新注册的不一样，报错
 		if (mappedHandler != null) {
 			if (mappedHandler != resolvedHandler) {
 				throw new IllegalStateException(
