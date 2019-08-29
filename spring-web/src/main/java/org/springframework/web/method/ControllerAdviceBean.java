@@ -235,6 +235,7 @@ public class ControllerAdviceBean implements Ordered {
 				adviceBeans.add(new ControllerAdviceBean(name, context, controllerAdvice));
 			}
 		}
+		// 根据order排序
 		OrderComparator.sort(adviceBeans);
 		return adviceBeans;
 	}
