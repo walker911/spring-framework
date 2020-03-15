@@ -292,6 +292,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 			}
 
 			// Bind the connection holder to the thread.
+			// 将当前 connection 放入 TransactionSynchronizationManager 中持有，最终就是把 Connection 对象放入 ThreadLocal 中
 			if (txObject.isNewConnectionHolder()) {
 				TransactionSynchronizationManager.bindResource(obtainDataSource(), txObject.getConnectionHolder());
 			}
